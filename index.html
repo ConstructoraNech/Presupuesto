@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Presupuesto de Mejoramiento</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+
+body{
+    background:#dcdcdc;
+    font-family: Arial, sans-serif;
+}
+
+/* ================= DOCUMENTO ================= */
+
+.documento{
+    width: 8in;
+    height: 10.5in;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 0.6in;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* ================= CONTENEDOR ================= */
+
+.contenido-ajustado{
+    margin-left: 55px;
+    margin-top: -5px; 
+    /* 🔧 AJUSTE GENERAL (SUBE TODO EL BLOQUE AZUL)
+       baja más: -10px
+       sube menos: 0px */
+    line-height: 1.5;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    font-family: 'ARIAL';
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:0;
+}
+
+.header img{
+    height:60px;
+}
+
+/* ================= TITULO ================= */
+
+.titulo{
+    font-family: 'CALIBRI';
+    font-size: 20px;
+    font-weight: bold;
+    margin:15px 0 15px 0;
+    text-align: center;
+}
+
+/* ================= SECCIONES ================= */
+
+.seccion{
+    font-size: 14px;
+    font-weight:bold;
+    margin-top:18px; /* 🔥 reduce separación */
+}
+
+/* 🔥 BREVE DESCRIPCIÓN (línea naranja) */
+.seccion:nth-of-type(2){
+    margin-top:5px;
+}
+
+/* ================= CAMPOS ================= */
+
+:root{
+    --margen-linea-derecha: 40px;
+}
+
+.campo-inline{
+    display:flex;
+    align-items:flex-end;
+    margin-top:18px;
+    margin-right: var(--margen-linea-derecha);
+}
+
+.campo-inline .texto{
+    white-space:nowrap;
+    margin-right:6px;
+    line-height:1.5;
+}
+
+/* LÍNEAS CORTAS */
+
+.input-linea-inline{
+    flex:1;
+    border:none;
+    border-bottom:1.6px solid #000;
+    height:18px;
+    outline:none;
+    font-size:14px;
+    padding:0;
+    line-height:18px;
+}
+
+/* NSS */
+
+.nss-linea{
+    flex:1;
+    font-size:14px;
+}
+
+/* LÍNEAS LARGAS */
+
+.input-linea-completa{
+    width:calc(100% - var(--margen-linea-derecha));
+    border:none;
+    border-bottom:1.6px solid #000;
+    height:18px;
+    margin-top:14px;
+    outline:none;
+    font-size:18px;
+    padding:0;
+    line-height:18px;
+}
+
+/* ================= DESCRIPCIÓN ================= */
+
+.descripcion{
+    font-size:12.6px;
+    line-height:1.5;
+    letter-spacing:0.3px;
+    font-weight:500;
+    text-transform:uppercase;
+}
+
+/* ================= PRESUPUESTO ================= */
+
+.presupuesto-box{
+    border:2px solid #000;
+    width:250px;
+    height:55px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    margin-top:5px; /* 🔥 línea azul */
+}
+
+.simbolo{
+    font-size:13px;
+    font-weight:lighter;
+    width:calc(25% - var(--margen-linea-derecha));   
+    transform: translateX(-34px); 
+}
+
+.input-presupuesto{
+    border:none !important;
+    background:transparent !important;
+    outline:none;
+    font-size:24px;
+    font-weight:lighter;
+    width:130px;
+    height:30px;
+
+    transform: translateY(-8px) translateX(16px); /* 🔥 mueve a la derecha */
+}
+
+/* ================= FIRMA ================= */
+
+.firma{
+    position:absolute;
+    bottom:120px;
+    width:87%;
+    text-align:center;
+    
+}
+
+.firma-linea{
+    width:351px;
+    margin:0 auto;
+    border-bottom:1px solid black;
+    height:60px;
+    margin-bottom:5px;
+}
+
+/* ================= FOOTER ================= */
+
+.footer-line{
+    border-top:6px solid #8b1e2d;
+    position:absolute;
+    bottom:93px; 
+    left:0.6in;
+    right:0.6in;
+}
+
+.footer-text{
+    font-size:11.2px;
+    font-weight:400;
+    position:absolute;
+    bottom:73px;
+    left:0.6in;
+}
+
+/* ================= CONTROLES ================= */
+
+.no-pdf{
+    position:absolute;
+    right:40px;
+    bottom:200px;  
+    
+}
+
+.no-pdf select{
+    position:relative;
+    z-index:10;
+}
+
+
+/* ================= BOTÓN ================= */
+
+.boton{
+    position:absolute;
+    right:40px;
+    bottom:160px;  
+   
+
+    padding:10px 20px;
+    background:#8b1e2d;
+    color:white;
+    border:none;
+    cursor:pointer;
+    transition: background-color 0.3s ease;       
+}
+
+.boton:hover{
+    background:#5a141d;
+}
+
+.error{
+    color:red;
+    font-size:13px;
+}
+
+/* ================= PRINT ================= */
+
+@media print{
+    .no-pdf{
+        display:none !important;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="documento" id="pdfArea">
+
+    <div class="header">
+        <img src="Logo.jpg" alt="">
+    </div>
+
+    <br>
+
+    <div class="titulo">
+        PRESUPUESTO DE MEJORAMIENTO 
+    </div>  
+
+    <!-- 🔥 TODO EL CONTENIDO ALINEADO -->
+    <div class="contenido-ajustado">
+
+        <div class="seccion">DATOS GENERALES:</div>
+
+       <!-- NOMBRE -->
+<div class="campo-inline">
+    <div class="texto">Nombre de la persona Derechohabiente:</div>
+    <input type="text" id="nombreLinea1" class="input-linea-inline salto-linea">
+</div>
+
+<input type="text" id="nombreLinea2" class="input-linea-completa salto-linea">
+
+        <!-- NSS -->
+        <div class="campo-inline">
+            <div class="texto">Número de Seguridad Social:</div>
+            <input type="text" class="input-linea-inline salto-linea nss-linea">
+        </div>
+
+        <br>
+
+        <!-- DIRECCIÓN -->
+        <div class="campo-inline">
+            <div class="texto">Dirección donde se realizará la mejora:</div>
+            <input type="text" class="input-linea-inline salto-linea">
+        </div>
+        <input type="text" class="input-linea-completa salto-linea">
+        <br>
+        <input type="text" class="input-linea-completa salto-linea">
+
+        <!-- DESCRIPCIÓN -->
+        <div class="seccion">BREVE DESCRIPCIÓN DE LA MEJORA A REALIZAR:</div>
+        <input type="text" class="input-linea-completa salto-linea descripcion">
+        <br>
+        <input type="text" class="input-linea-completa salto-linea descripcion">
+        <br>
+        <input type="text" class="input-linea-completa salto-linea descripcion">
+        <br>
+        <input type="text" class="input-linea-completa salto-linea descripcion">
+
+        <div class="seccion">PRESUPUESTO ESTIMADO</div>
+
+        <div class="presupuesto-box">
+            <span class="simbolo">$</span>
+            <input type="text" id="presupuesto" class="input-presupuesto" autocomplete="off">
+        </div>
+
+        <div class="no-pdf">
+            <br><br>
+            <select id="tipoMejora">
+                <option value="">Seleccione tipo</option>
+                <option value="casa">MEJORAS CASA</option>
+                <option value="depto">MEJORAS DEPTO</option>
+            </select>
+        </div>
+
+    </div>
+
+    <div class="firma">
+        <div class="firma-linea"></div>
+        <b>Fecha y Firma de la persona Derechohabiente</b> 
+    </div>
+
+    <div class="footer-line"></div>
+    <div class="footer-text">
+        <b>Barranca del Muerto 280, Guadalupe Inn, Álvaro Obregón, 01020 Ciudad de México, CDMX</b>
+    </div>
+
+    <button class="boton no-pdf" onclick="validarYDescargar()">Descargar PDF</button>
+
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<script>
+
+const presupuestoInput = document.getElementById("presupuesto");
+const tipoMejora = document.getElementById("tipoMejora");
+const camposDescripcion = document.querySelectorAll(".descripcion");
+
+/* ================================================= */
+/* ===== FUNCION PRINCIPAL DE CALCULO ============== */
+/* ================================================= */
+
+function calcularDescripcion(){
+
+    if(presupuestoInput.value.trim() === ""){
+        limpiarDescripcion();
+        return;
+    }
+
+    let valor = presupuestoInput.value.replace(/[^0-9]/g,'');
+
+    if(valor === ""){
+        limpiarDescripcion();
+        presupuestoInput.value = "";
+        return;
+    }
+
+    let numero = parseFloat(valor) / 100;
+
+    presupuestoInput.value = numero.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    if(tipoMejora.value === ""){
+        limpiarDescripcion();
+        return;
+    }
+
+    let texto = "";
+    let mejoras = [];
+    let cantidad = 0;
+
+/* ========================= */
+/* ========= CASA ========== */
+/* ========================= */
+
+if(tipoMejora.value === "casa"){
+
+    if(numero >= 10698.67 && numero <= 25999.00){
+        mejoras = [
+            "MEJORAR LA INSTALACION ELECTRICA",
+            "CAMBIO DE PINTURA EN PAREDES, TECHO",
+            "COLOCACION DE PISO SALA, RECAMARAS, COCINA",
+            "SELLADO PINTURA DE PAREDES, TECHO",
+            "APLANADO, RESANADO DE PAREDES",
+            "CAMBIO DE PISO, AZULEJO EN BAÑO"
+        ];
+        cantidad = 1;
+    }
+
+    else if(numero >= 26000.00 && numero <= 45999.00){
+        mejoras = [
+            "MEJORA EN TECHO DE RECAMARAS, COCINA",
+            "CAMBIO O MEJORA DE PUERTAS DE RECAMARAS, BAÑO",
+            "COLOCACION DE PISO SALA, RECAMARAS, COCINA",
+            "CAMBIO DE PINTURA EN PAREDES, TECHO",
+            "IMPERMEABILIZACION EN AZOTEA CON MALLA DE REFUERZO"
+        ];
+        cantidad = 2;
+    }
+
+    else if(numero >= 46000.00 && numero <= 79999.00){
+        mejoras = [
+            "CAMBIO O MEJORA DE PUERTAS DE RECAMARAS, BAÑO",
+            "SELLADO PINTURA DE PAREDES, TECHOS",
+            "MEJORA EN TECHO DE RECAMARAS, COCINA",
+            "APLANADO, RESANADO DE PAREDES",
+            "MEJORAR LA INSTALACION ELECTRICA",
+            "CAMBIO CANCELERIA, VIDRIOS",
+            "COLOCACION DE PISO SALA, RECAMARAS, COCINA",
+            "CAMBIO DE PISO, AZULEJO EN BAÑO",
+            "CAMBIO DE TINACO CON CONEXION HIDRAULICA",
+            "CAMBIO DE MUEBLES, ACCESORIOS DE BAÑO",
+            "CAMBIO DE WC, LAVABO, REGADERA",
+            "COLOCACION DE CANCEL EN BAÑO",
+            "CAMBIO DE CALENTADOR DE DEPOSITO"
+        ];
+
+        cantidad = Math.random() < 0.5 ? 3 : 4;
+    }
+
+    else if(numero >= 80000.00 && numero <= 140999.00){
+        mejoras = [
+            "MEJORA EN TUBERIA DE AGUA, DRENAJE",
+            "MEJORAR LA INSTALACION ELECTRICA",
+            "MEJORA EN INSTALACION DE GAS, AGUA",
+            "IMPERMEABILIZACION EN AZOTEA CON MALLA DE REFUERZO",
+            "CAMBIO DE PINTURA EN PAREDES, TECHO",
+            "MEJORA EN TECHO DE RECAMARAS, COCINA",
+            "CAMBIO CANCELERIA, VIDRIOS",
+            "CAMBIO O MEJORA DE PUERTAS DE RECAMARAS, BAÑO",
+            "APLANADO, RESANADO DE PAREDES",
+            "COLOCACION DE PISO SALA, RECAMARAS, COCINA",
+            "COLADO DE PISO",
+            "REMODELACION DE BAÑO",
+            "REMODELACION DE COCINA",
+            "REMODELACION DE RECAMARAS",
+            "CAMBIO DE TINACO CON CONEXION HIDRAULICA",
+            "CAMBIO DE MUEBLES, ACCESORIOS DE BAÑO",
+            "CAMBIO DE WC, LAVABO, REGADERA",
+            "SELLADO PINTURA DE PAREDES, TECHOS",
+            "CAMBIO DE PISO, AZULEJO EN BAÑO",
+            "COLOCACION DE CANCEL EN BAÑO",
+            "CAMBIO DE CALENTADOR DE DEPOSITO",
+            "CAMBIO DE BOYLER"
+        ];
+        cantidad = 5;
+    }
+
+    else if(numero >= 150000.00 && numero <= 169039.02){
+        mejoras = [
+            "CAMBIO DE MUEBLES, ACCESORIOS DE BAÑO",
+            "SELLADO, PINTURA DE PAREDES, TECHOS DE RECAMARAS, SALA, COMEDOR",
+            "CAMBIO DE PISO, AZULEJO EN BAÑO",
+            "COLOCACION DE CANCEL EN BAÑO",
+            "IMPERMEABILIZACION EN AZOTEA CON MALLA DE REFUERZO",
+            "CAMBIO DE PISO, AZULEJO EN SALA, COMEDOR, RECAMARAS",
+            "CAMBIO DE PINTURA EN PAREDES, TECHO",
+            "CAMBIO DE BOYLER"
+        ];
+        cantidad = 6;
+    }
+}
+
+/* ========================= */
+/* ========= DEPTO ========= */
+/* ========================= */
+
+else if(tipoMejora.value === "depto"){
+
+    if(numero >= 10318.38 && numero <= 25999.00){
+        mejoras = [
+            "CAMBIO DE PINTURA EN PAREDES, TECHOS",
+            "CAMBIO DE PUERTAS EN RECAMARAS",
+            "APLANADO, RESANADO DE PAREDES",
+            "SELLADO DE PAREDES Y TECHOS",
+            "CAMBIO DE PISO EN SALA Y RECAMARAS"
+        ];
+        cantidad = 1;
+    }
+
+    else if(numero >= 26000.00 && numero <= 45999.00){
+        mejoras = [
+            "MEJORA EN TECHO",
+            "CAMBIO DE PUERTAS",
+            "CAMBIO DE AZULEJO EN BAÑO",
+            "CAMBIO DE PISO",
+            "APLANADO DE PAREDES",
+            "CAMBIO DE PINTURA"
+        ];
+        cantidad = 2;
+    }
+
+    else if(numero >= 46000.00 && numero <= 70999.99){
+        mejoras = [
+            "MEJORA EN TECHO",
+            "CAMBIO DE PUERTAS",
+            "CAMBIO DE AZULEJO EN BAÑO",
+            "CAMBIO DE PISO",
+            "INSTALACION ELECTRICA",
+            "CAMBIO DE WC Y LAVABO",
+            "SELLADO Y PINTURA",
+            "CAMBIO DE CANCELERIA"
+        ];
+        cantidad = Math.random() < 0.5 ? 3 : 4;
+    }
+
+    else if(numero >= 71000.00 && numero <= 140999.99){
+        mejoras = [
+            "REMODELACION COMPLETA",
+            "CAMBIO DE PISO",
+            "CAMBIO DE BAÑO",
+            "PINTURA GENERAL",
+            "CAMBIO DE INSTALACIONES"
+        ];
+        cantidad = 5;
+    }
+
+    else if(numero >= 150000.00 && numero <= 163030.21){
+        mejoras = [
+            "CAMBIO DE AZULEJO  PISO EN BAÑO",
+            "CAMBIO DE MUEBLES  ACCESORIOS DE BAÑO",
+            "SELLADO PINTURA DE PAREDES , TECHOS DE RECAMARAS, SALA COMEDOR",
+            "CAMBIO DE PISO EN SALA, COMEDOR , RECAMARAS",
+            "CAMBIO DE LAMPARAS POR FOCOS AHORRADORES",
+            "CAMBIO DE BOYLER"
+        ];
+        cantidad = 6;
+    }
+}
+
+/* ========================= */
+/* ===== RESULTADO ========= */
+/* ========================= */
+
+if(mejoras.length > 0){
+    texto = seleccionarAleatorias(mejoras, cantidad).join(", ");
+    distribuirTexto(texto);
+} else {
+    limpiarDescripcion();
+}
+
+}
+
+/* ========================= */
+/* ===== EVENTOS =========== */
+/* ========================= */
+
+presupuestoInput.addEventListener("input", calcularDescripcion);
+tipoMejora.addEventListener("change", calcularDescripcion);
+
+/* ========================= */
+/* ===== FUNCIONES ========= */
+/* ========================= */
+
+function seleccionarAleatorias(lista, cantidad){
+    let copia = [...lista];
+    let resultado = [];
+
+    for(let i = 0; i < cantidad; i++){
+        if(copia.length === 0) break;
+        let indice = Math.floor(Math.random() * copia.length);
+        resultado.push(copia[indice]);
+        copia.splice(indice,1);
+    }
+
+    return resultado;
+}
+
+function limpiarDescripcion(){
+    camposDescripcion.forEach(campo => campo.value = "");
+}
+
+function distribuirTexto(texto){
+    limpiarDescripcion();
+    let palabras = texto.split(" ");
+    let index = 0;
+
+    camposDescripcion.forEach(campo => {
+        let linea = "";
+
+        while(index < palabras.length){
+            let prueba = linea + palabras[index] + " ";
+            campo.value = prueba;
+
+            if(campo.scrollWidth > campo.clientWidth){
+                break;
+            }
+
+            linea = prueba;
+            index++;
+        }
+
+        campo.value = linea.trim();
+    });
+}
+
+/* ========================= */
+/* ===== PDF EDITABLE ====== */
+/* ========================= */
+async function validarYDescargar(){
+
+    const elemento = document.getElementById("pdfArea");
+
+    const nombre1 = document.getElementById("nombreLinea1").value.trim();
+    const nombre2 = document.getElementById("nombreLinea2").value.trim();
+
+    let nombreArchivo = (nombre1 + " " + nombre2)
+        .replace(/\s+/g,"_")
+        .toUpperCase();
+
+    // ocultar botones
+    const elementosOcultar = document.querySelectorAll(".no-pdf");
+    elementosOcultar.forEach(el => el.style.display = "none");
+
+    await html2pdf().set({
+        margin:0,
+        filename: nombreArchivo + "_PRESUPUESTO.pdf",
+        image:{type:'jpeg',quality:1},
+        html2canvas:{
+            scale:2,
+            scrollY: 0
+        },
+        jsPDF:{
+            unit:'pt',
+            format:'letter',
+            orientation:'portrait'
+        },
+        pagebreak:{mode:['avoid-all']}
+    }).from(elemento).save();
+
+    // restaurar
+    elementosOcultar.forEach(el => el.style.display = "");
+}
+
+
+
+</script>
+
+
+</body>
+</html>
